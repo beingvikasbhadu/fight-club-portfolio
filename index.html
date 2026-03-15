@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VIKAS BHADU — Backend Developer</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23060809' stroke='%23888' stroke-width='1'/%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff' stop-opacity='1'/%3E%3Cstop offset='35%25' stop-color='%23ffee88' stop-opacity='0.9'/%3E%3Cstop offset='70%25' stop-color='%23ff8800' stop-opacity='0.4'/%3E%3Cstop offset='100%25' stop-color='%23000000' stop-opacity='0'/%3E%3C/radialGradient%3E%3Ccircle cx='16' cy='16' r='10' fill='url(%23g)'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23ffffff' opacity='0.95'/%3E%3C/svg%3E">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -639,12 +640,13 @@
         You are the all-singing, all-dancing crap of the world."
         <br><span style="font-size:9px;letter-spacing:3px;color:var(--teal-glow)">— TYLER DURDEN, FIGHT CLUB 1999</span>
       </p>
-      <form id="contactForm" action="https://formspree.io/f/mojnydpg" method="POST">
+      <form id="contactForm">
         <div class="form-field"><input type="text" id="fn" name="name" placeholder="x" required/><label for="fn">Your Name</label></div>
         <div class="form-field"><input type="email" id="fe" name="email" placeholder="x" required/><label for="fe">Your Email</label></div>
         <div class="form-field"><input type="text" id="fs" name="subject" placeholder="x"/><label for="fs">Opportunity / Subject</label></div>
         <div class="form-field"><textarea id="fm" name="message" placeholder="x" required></textarea><label for="fm">Your Message</label></div>
-        <button class="send-btn" type="submit">Transmit Signal →</button>
+        <button class="send-btn" type="button" id="submitBtn">Transmit Signal →</button>
+        <p id="formMsg" style="display:none;margin-top:18px;font-family:'Special Elite',cursive;font-size:12px;letter-spacing:3px;"></p>
       </form>
     </div>
   </div>
@@ -762,6 +764,49 @@
   const heroBg=document.querySelector('.hero-bg');
   window.addEventListener('scroll',()=>{if(window.scrollY<window.innerHeight)heroBg.style.transform=`translateY(${window.scrollY*.35}px)`;},{passive:true});
 
+
+  /* ── FORMSPREE FETCH ── */
+  document.getElementById('submitBtn').addEventListener('click', async function() {
+    const name    = document.getElementById('fn').value.trim();
+    const email   = document.getElementById('fe').value.trim();
+    const subject = document.getElementById('fs').value.trim();
+    const message = document.getElementById('fm').value.trim();
+    const msg     = document.getElementById('formMsg');
+
+    if (!name || !email || !message) {
+      msg.style.color = 'var(--red-hot)';
+      msg.textContent = '✦ NAME, EMAIL & MESSAGE ARE REQUIRED.';
+      msg.style.display = 'block';
+      return;
+    }
+
+    this.textContent = 'Transmitting...';
+    this.disabled = true;
+
+    try {
+      const res = await fetch('https://formspree.io/f/mojnydpg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name, email, subject, message })
+      });
+
+      if (res.ok) {
+        msg.style.color = 'var(--teal-light)';
+        msg.textContent = '✦ SIGNAL RECEIVED. VIKAS WILL RESPOND.';
+        msg.style.display = 'block';
+        this.textContent = '✦ Signal Sent';
+        document.getElementById('contactForm').reset();
+      } else {
+        throw new Error();
+      }
+    } catch(e) {
+      msg.style.color = 'var(--red-hot)';
+      msg.textContent = '✦ TRANSMISSION FAILED. TRY AGAIN.';
+      msg.style.display = 'block';
+      this.textContent = 'Transmit Signal →';
+      this.disabled = false;
+    }
+  });
 </script>
 </body>
 </html>
